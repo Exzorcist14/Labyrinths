@@ -19,18 +19,27 @@ const (
 	ErrorCoordinatesInputMessage = "Пожалуйста, введите корректные координаты:"
 )
 
+type reader interface {
+	Read(p []byte) (n int, err error)
+}
+
+type writer interface {
+	Write(p []byte) (nn int, err error)
+	Flush() error
+}
+
 // console - консольная реализация пользовательского интерфейса.
 type console struct {
-	reader   bufio.Reader
-	writer   bufio.Writer
+	reader   reader
+	writer   writer
 	renderer renderer.Renderer
 }
 
 // newConsole возвращает указатель на инициализированную структуру консоли.
 func newConsole(rendererType string, palette renderer.Palette) *console {
 	return &console{
-		reader:   *bufio.NewReader(os.Stdin),
-		writer:   *bufio.NewWriter(os.Stdout),
+		reader:   bufio.NewReader(os.Stdin),
+		writer:   bufio.NewWriter(os.Stdout),
 		renderer: renderer.New(rendererType, palette),
 	}
 }
@@ -144,13 +153,13 @@ func (c *console) askCorrectData(
 
 // read читает данные в data.
 func (c *console) read(data ...any) error {
-	_, err := fmt.Fscan(&c.reader, data...)
+	_, err := fmt.Fscan(c.reader, data...)
 
 	if err != nil {
 		return fmt.Errorf("can`t scan data: %w", err)
 	}
 
-	_, err = fmt.Fscanln(&c.reader)
+	_, err = fmt.Fscanln(c.reader)
 	if err != nil {
 		return fmt.Errorf("can`t scan data: %w", err)
 	}
@@ -160,7 +169,7 @@ func (c *console) read(data ...any) error {
 
 // printf выводит данные согласно формату.
 func (c *console) printf(format string, a ...any) error {
-	_, err := fmt.Fprintf(&c.writer, format, a...)
+	_, err := fmt.Fprintf(c.writer, format, a...)
 	if err != nil {
 		return fmt.Errorf("can`t write formatted data: %w", err)
 	}
