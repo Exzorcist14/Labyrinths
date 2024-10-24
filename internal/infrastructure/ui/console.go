@@ -11,12 +11,12 @@ import (
 )
 
 const (
-	DIMENSIONS_INPUT_MESSAGE        = "Введите ширину и высоту базового лабиринта:"
-	ERROR_DIMENSIONS_INPUT_MESSAGE  = "Пожалуйста, введите корректные ширину и высоту базового лабиринта:"
-	NOTE_MESSAGE                    = "Примечание: начало координат лежит в левом верхнем углу, координаты начинаются с нуля"
-	START_INPUT_MESSAGE             = "Введите координаты начальной точки:"
-	END_INPUT_MESSAGE               = "Введите координаты конечной точки:"
-	ERROR_COORDINATES_INPUT_MESSAGE = "Пожалуйста, введите корректные координаты:"
+	DimensionsInputMessage       = "Введите ширину и высоту базового лабиринта:"
+	ErrorDimensionsInputMessage  = "Пожалуйста, введите корректные ширину и высоту базового лабиринта:"
+	NoteMessage                  = "Примечание: начало координат лежит в левом верхнем углу, координаты начинаются с нуля"
+	StartInputMessage            = "Введите координаты начальной точки:"
+	EndInputMessage              = "Введите координаты конечной точки:"
+	ErrorCoordinatesInputMessage = "Пожалуйста, введите корректные координаты:"
 )
 
 // console - консольная реализация пользовательского интерфейса.
@@ -54,8 +54,8 @@ func (c *console) AskMazeDimensions() (height, width int, err error) {
 
 	c.askCorrectData(
 		"%s\n",
-		DIMENSIONS_INPUT_MESSAGE,
-		ERROR_DIMENSIONS_INPUT_MESSAGE,
+		DimensionsInputMessage,
+		ErrorDimensionsInputMessage,
 		areValids,
 		&width, &height,
 	)
@@ -82,12 +82,12 @@ func (c *console) AskCoordinates(height, width int) (start, end cells.Coordinate
 		return true
 	}
 
-	c.printf("\n%s\n", NOTE_MESSAGE)
+	c.printf("\n%s\n", NoteMessage)
 
 	c.askCorrectData(
 		"%s\n",
-		START_INPUT_MESSAGE,
-		ERROR_COORDINATES_INPUT_MESSAGE,
+		StartInputMessage,
+		ErrorCoordinatesInputMessage,
 		areValids,
 		&x, &y,
 	)
@@ -99,8 +99,8 @@ func (c *console) AskCoordinates(height, width int) (start, end cells.Coordinate
 
 	c.askCorrectData(
 		"\n%s\n",
-		END_INPUT_MESSAGE,
-		ERROR_COORDINATES_INPUT_MESSAGE,
+		EndInputMessage,
+		ErrorCoordinatesInputMessage,
 		areValids,
 		&x, &y,
 	)
@@ -114,13 +114,13 @@ func (c *console) AskCoordinates(height, width int) (start, end cells.Coordinate
 }
 
 // DisplayMaze отображает лабиринт.
-func (c *console) DisplayMaze(maze maze.Maze) {
-	c.printf("\n%s\n", c.renderer.Render(maze))
+func (c *console) DisplayMaze(mz maze.Maze) {
+	c.printf("\n%s\n", c.renderer.Render(mz))
 }
 
 // DisplayMazeWithPath отображает лабиринт и путь на нём.
-func (c *console) DisplayMazeWithPath(maze maze.Maze, path []cells.Coordinates) {
-	c.printf("\n%s\n", c.renderer.RenderPath(maze, path))
+func (c *console) DisplayMazeWithPath(mz maze.Maze, path []cells.Coordinates) {
+	c.printf("\n%s\n", c.renderer.RenderPath(mz, path))
 }
 
 // askCorrectData спрашивает данные до тех пор, пока они не будут корректными, читая их в data...;
@@ -135,7 +135,7 @@ func (c *console) askCorrectData(
 	for {
 		err := c.read(data...)
 		if err != nil || !areValid(data...) {
-			c.printf("%s", ERROR_COORDINATES_INPUT_MESSAGE)
+			c.printf("%s", errorMessage)
 		} else {
 			break
 		}
@@ -145,8 +145,13 @@ func (c *console) askCorrectData(
 // read читает данные в data.
 func (c *console) read(data ...any) error {
 	_, err := fmt.Fscan(&c.reader, data...)
+
 	if err != nil {
-		fmt.Fscanln(&c.reader)
+		return fmt.Errorf("can`t scan data: %w", err)
+	}
+
+	_, err = fmt.Fscanln(&c.reader)
+	if err != nil {
 		return fmt.Errorf("can`t scan data: %w", err)
 	}
 

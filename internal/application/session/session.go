@@ -20,12 +20,12 @@ type Session struct {
 
 // New возвращает инициализированную структуру Session.
 func New() (*Session, error) {
-	config := config.Config{}
+	cfg := config.Config{}
 	palette := renderer.Palette{}
 
-	err := file.LoadData("./internal/infrastructure/files/config.json", &config)
+	err := file.LoadData("./internal/infrastructure/files/cfg.json", &cfg)
 	if err != nil {
-		return nil, fmt.Errorf("can`t load config: %w", err)
+		return nil, fmt.Errorf("can`t load cfg: %w", err)
 	}
 
 	err = file.LoadData("./internal/infrastructure/files/palette.json", &palette)
@@ -34,9 +34,9 @@ func New() (*Session, error) {
 	}
 
 	return &Session{
-		generator: generator.New(config.GeneratorType),
-		solver:    solver.New(config.SolverType),
-		ui:        ui.New(config.UIType, config.RendererType, palette),
+		generator: generator.New(cfg.GeneratorType),
+		solver:    solver.New(cfg.SolverType),
+		ui:        ui.New(cfg.UIType, cfg.RendererType, palette),
 	}, nil
 }
 

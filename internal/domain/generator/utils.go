@@ -90,9 +90,9 @@ func GetRandomSignificantType() (cells.Type, error) {
 	return significantTypes[number], nil
 }
 
-// GetRandomInt возвращает случайное число из полуинтервала [0, max).
-func GetRandomInt(max int) (int, error) {
-	result, err := rand.Int(rand.Reader, big.NewInt(int64(max)))
+// GetRandomInt возвращает случайное число из полуинтервала [0, limit).
+func GetRandomInt(limit int) (int, error) {
+	result, err := rand.Int(rand.Reader, big.NewInt(int64(limit)))
 	if err != nil {
 		return 0, fmt.Errorf("can`t generate random int: %w", err)
 	}

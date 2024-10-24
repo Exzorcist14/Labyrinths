@@ -6,8 +6,8 @@ import (
 )
 
 type Renderer interface {
-	Render(Maze maze.Maze) string                               // Отображает лабиринт в готовую для визуализации строку.
-	RenderPath(Maze maze.Maze, path []cells.Coordinates) string // Отображает лабиринт и путь в готовую для визуализации строку.
+	Render(mz maze.Maze) string                               // Отображает лабиринт в готовую для визуализации строку.
+	RenderPath(mz maze.Maze, path []cells.Coordinates) string // Отображает лабиринт и путь в готовую для визуализации строку.
 }
 
 // New как фабрика возвращает конкретную реализацию Renderer по строке, обозначающей желаемую реализацию, и палитре.

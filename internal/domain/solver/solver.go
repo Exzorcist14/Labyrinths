@@ -6,12 +6,12 @@ import (
 )
 
 type Solver interface {
-	Solve(maze maze.Maze, begin, end cells.Coordinates) []cells.Coordinates
+	Solve(mz maze.Maze, begin, end cells.Coordinates) []cells.Coordinates
 }
 
 // New как фабрика возвращает конкретную реализацию Solver по строке, обозначающей желаемую реализацию.
-func New(SolverType string) Solver {
-	switch SolverType {
+func New(solverType string) Solver {
+	switch solverType {
 	case "dijkstra":
 		return newDijkstraSolver()
 	case "mdfs":

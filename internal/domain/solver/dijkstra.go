@@ -17,7 +17,7 @@ type dijkstraSolver struct {
 	dist         map[cells.Coordinates]cells.Type // Хранит для каждой вершины информацию об её оценке пути.
 	heap         heaps.Heap                       // Куча минимумов, содержащая вершины и их оценку пути.
 	predecessors sutils.Predecessors              // Хранит для каждой вершины информацию о её предшественниках.
-	maze         maze.Maze
+	mz           maze.Maze
 }
 
 // newDijkstraSolver возвращает указатель на инициализированный dijkstraSolver.
@@ -30,9 +30,9 @@ func newDijkstraSolver() *dijkstraSolver {
 	return &ds
 }
 
-// Solve находит и возвращает путь от start до end в maze в виде []cells.Coordinates.
-func (s *dijkstraSolver) Solve(maze maze.Maze, start, end cells.Coordinates) []cells.Coordinates {
-	s.prepare(maze.Height, maze.Width)
+// Solve находит и возвращает путь от start до end в mz в виде []cells.Coordinates.
+func (s *dijkstraSolver) Solve(mz maze.Maze, start, end cells.Coordinates) []cells.Coordinates {
+	s.prepare(mz.Height, mz.Width)
 
 	s.dijkstra(start, end)
 
@@ -56,8 +56,7 @@ func (s *dijkstraSolver) dijkstra(start, end cells.Coordinates) {
 	//   3.3) Записывается координата вершины A (необходимо для восстановления пути по предшественникам).
 	//
 	// Пункты 2, 3, 4 повторяются, пока в куче существуют вершины, которые необходимо рассмотреть.
-
-	weight := s.maze.Cells[start.Y][start.X].Type
+	weight := s.mz.Cells[start.Y][start.X].Type
 
 	s.dist[start] = weight
 	s.heap.Push(heaps.Item{Vertex: start, Weight: weight})
@@ -69,11 +68,11 @@ func (s *dijkstraSolver) dijkstra(start, end cells.Coordinates) {
 			break
 		}
 
-		for _, vertex2 := range s.maze.Cells[vertex1.Y][vertex1.X].Transitions { // Рассматриваем смежные вершины.
+		for _, vertex2 := range s.mz.Cells[vertex1.Y][vertex1.X].Transitions { // Рассматриваем смежные вершины.
 			if s.dist[vertex2] == INF { // Если оценка пути равна INF.
-				s.dist[vertex2] = s.dist[vertex1] + s.maze.Cells[vertex2.Y][vertex2.X].Type // Обновляем оценку пути.
-				s.heap.Push(heaps.Item{Vertex: vertex2, Weight: s.dist[vertex2]})           // Добавляем в кучу.
-				s.predecessors[vertex2] = vertex1                                           // Записываем предшественника для vertex2.
+				s.dist[vertex2] = s.dist[vertex1] + s.mz.Cells[vertex2.Y][vertex2.X].Type // Обновляем оценку пути.
+				s.heap.Push(heaps.Item{Vertex: vertex2, Weight: s.dist[vertex2]})         // Добавляем в кучу.
+				s.predecessors[vertex2] = vertex1                                         // Записываем предшественника для vertex2.
 			}
 		}
 	}
@@ -83,7 +82,7 @@ func (s *dijkstraSolver) dijkstra(start, end cells.Coordinates) {
 func (s *dijkstraSolver) prepare(height, width int) {
 	for y := 0; y < height; y++ {
 		for x := 0; x < width; x++ {
-			s.dist[cells.Coordinates{x, y}] = INF // Изначально оценка пути до каждой вершины равна INF.
+			s.dist[cells.Coordinates{X: x, Y: y}] = INF // Изначально оценка пути до каждой вершины равна INF.
 		}
 	}
 
