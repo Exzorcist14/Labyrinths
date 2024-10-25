@@ -27,7 +27,7 @@ func (r *expanderRenderer) Render(mz maze.Maze) string {
 	return convertToString(expandMaze(mz), r.palette)
 }
 
-// Render отображает лабиринт и путь в нём в готовую для визуализации строку и возвращает её.
+// RenderPath отображает лабиринт и путь в нём в готовую для визуализации строку и возвращает её.
 func (r *expanderRenderer) RenderPath(mz maze.Maze, path []cells.Coordinates) string {
 	return convertToString(expandMaze(overlayPath(mz, path)), r.palette)
 }
@@ -35,16 +35,16 @@ func (r *expanderRenderer) RenderPath(mz maze.Maze, path []cells.Coordinates) st
 // expandPalette возвращает расширенную визуализацией вспомогательных типов палитру.
 func expandPalette(palette Palette) Palette {
 	palette[transition] = "\U0001F532" // 🔲
-	palette[Start] = "⭐"
-	palette[End] = "🚩"
-	palette[Path] = "\U0001F7E9" // 🟩
+	palette[Start] = "⭐"               // ⭐
+	palette[End] = "🚩"                 // 🚩
+	palette[Path] = "\U0001F7E9"       // 🟩
 
 	return palette
 }
 
 // expandMaze возвращает расширенный лабиринт, в котором появляются стены.
 func expandMaze(mz maze.Maze) maze.Maze {
-	expandedMaze := maze.New(2*mz.Height-1, 2*mz.Width-1) // Между строками и столбаци появляются новые.
+	expandedMaze := maze.New(2*mz.Height-1, 2*mz.Width-1) // Между строками и столбцами появляются новые.
 
 	for y, row := range mz.Cells {
 		for x, cell := range row {
