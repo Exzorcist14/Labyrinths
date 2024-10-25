@@ -25,7 +25,7 @@ func New() (*Session, error) {
 
 	err := file.LoadData("./internal/infrastructure/files/config.json", &cfg)
 	if err != nil {
-		return nil, fmt.Errorf("can`t load cfg: %w", err)
+		return nil, fmt.Errorf("can`t load config: %w", err)
 	}
 
 	err = file.LoadData("./internal/infrastructure/files/palette.json", &palette)
@@ -44,7 +44,7 @@ func New() (*Session, error) {
 func (s *Session) Run() error {
 	height, width, err := s.ui.AskMazeDimensions() // Спрашиваем размеры лабиринта.
 	if err != nil {
-		return fmt.Errorf("can`t enter maze dimensions: %w", err)
+		return fmt.Errorf("can`t ask maze dimensions: %w", err)
 	}
 
 	maze, err := s.generator.Generate(height, width) // Генерируем лабиринт.
@@ -54,7 +54,7 @@ func (s *Session) Run() error {
 
 	start, end, err := s.ui.AskCoordinates(height, width) // Спрашиваем координаты начала и конца.
 	if err != nil {
-		return fmt.Errorf("can`t enter coordinates: %w", err)
+		return fmt.Errorf("can`t ask start and end coordinates: %w", err)
 	}
 
 	path := s.solver.Solve(maze, start, end) // Ищем путь между началом и концом.
