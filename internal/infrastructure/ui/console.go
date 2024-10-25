@@ -61,13 +61,18 @@ func (c *console) AskMazeDimensions() (height, width int, err error) {
 		return true
 	}
 
-	c.askCorrectData(
+	err = askCorrectData(
+		c.printf,
+		c.read,
 		"%s\n",
 		DimensionsInputMessage,
 		ErrorDimensionsInputMessage,
 		areValids,
 		&width, &height,
 	)
+	if err != nil {
+		return height, width, fmt.Errorf("can`t ask correct data: %w", err)
+	}
 
 	return height, width, nil
 }
@@ -91,28 +96,42 @@ func (c *console) AskCoordinates(height, width int) (start, end cells.Coordinate
 		return true
 	}
 
-	c.printf("\n%s\n", NoteMessage)
+	err = c.printf("\n%s\n", NoteMessage)
+	if err != nil {
+		return start, end, fmt.Errorf("can`t print format data: %w", err)
+	}
 
-	c.askCorrectData(
+	err = askCorrectData(
+		c.printf,
+		c.read,
 		"%s\n",
 		StartInputMessage,
 		ErrorCoordinatesInputMessage,
 		areValids,
 		&x, &y,
 	)
+	if err != nil {
+		return start, end, fmt.Errorf("can`t ask correct data: %w", err)
+	}
 
 	start = cells.Coordinates{
 		X: x,
 		Y: y,
 	}
 
-	c.askCorrectData(
+	err = askCorrectData(
+		c.printf,
+		c.read,
 		"\n%s\n",
 		EndInputMessage,
 		ErrorCoordinatesInputMessage,
 		areValids,
 		&x, &y,
 	)
+
+	if err != nil {
+		return start, end, fmt.Errorf("can`t ask correct data: %w", err)
+	}
 
 	end = cells.Coordinates{
 		X: x,
@@ -134,21 +153,31 @@ func (c *console) DisplayMazeWithPath(mz maze.Maze, path []cells.Coordinates) {
 
 // askCorrectData спрашивает данные до тех пор, пока они не будут корректными, читая их в data...;
 // данные, которые нужно спросить, должны передаваться по указателю.
-func (c *console) askCorrectData(
+func askCorrectData(
+	printf func(format string, a ...any) error,
+	read func(data ...any) error,
 	messageFormat, message, errorMessage string,
 	areValid func(data ...any) bool,
 	data ...any,
-) {
-	c.printf(messageFormat, message)
+) error {
+	errPrint := printf(messageFormat, message)
+	if errPrint != nil {
+		return fmt.Errorf("can`t print format message: %w", errPrint)
+	}
 
 	for {
-		err := c.read(data...)
-		if err != nil || !areValid(data...) {
-			c.printf("%s", errorMessage)
+		errRead := read(data...)
+		if errRead != nil || !areValid(data...) {
+			errPrint = printf("%s", errorMessage)
+			if errPrint != nil {
+				return fmt.Errorf("can`t print format errpr message: %w", errPrint)
+			}
 		} else {
 			break
 		}
 	}
+
+	return nil
 }
 
 // read читает данные в data.
