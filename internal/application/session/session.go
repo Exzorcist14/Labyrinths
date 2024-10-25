@@ -23,7 +23,7 @@ func New() (*Session, error) {
 	cfg := config.Config{}
 	palette := renderer.Palette{}
 
-	err := file.LoadData("./internal/infrastructure/files/cfg.json", &cfg)
+	err := file.LoadData("./internal/infrastructure/files/config.json", &cfg)
 	if err != nil {
 		return nil, fmt.Errorf("can`t load cfg: %w", err)
 	}
