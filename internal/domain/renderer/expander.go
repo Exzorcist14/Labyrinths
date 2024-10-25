@@ -35,7 +35,9 @@ func (r *expanderRenderer) RenderPath(mz maze.Maze, path []cells.Coordinates) st
 // expandPalette возвращает расширенную визуализацией вспомогательных типов палитру.
 func expandPalette(palette Palette) Palette {
 	palette[transition] = "\U0001F532" // 🔲
-	palette[Path] = "\U0001F7E9"       // 🟩
+	palette[Start] = "⭐"
+	palette[End] = "🚩"
+	palette[Path] = "\U0001F7E9" // 🟩
 
 	return palette
 }
@@ -77,8 +79,11 @@ func cutEdges(mz maze.Maze) maze.Maze {
 						Y: (y + adjacentCoords.Y) / 2, // Y получается по формуле середины отрезка.
 					}
 
-					if cell.Type == Path && mz.Cells[adjacentCoords.Y][adjacentCoords.X].Type == Path {
-						mz.Cells[edgeCoords.Y][edgeCoords.X].Type = Path // Прорезаемое ребро принадлежит пути.
+					_, ok1 := pathParts[cell.Type]
+					_, ok2 := pathParts[mz.Cells[adjacentCoords.Y][adjacentCoords.X].Type]
+
+					if ok1 && ok2 { // Если прорезаемое ребро принадлежит пути.
+						mz.Cells[edgeCoords.Y][edgeCoords.X].Type = Path
 					} else {
 						mz.Cells[edgeCoords.Y][edgeCoords.X].Type = transition
 					}
@@ -102,8 +107,15 @@ func cutEdges(mz maze.Maze) maze.Maze {
 
 // overlayPath помечает клетки не расширенного лабиринта, принадлежащие path, как Path.
 func overlayPath(mz maze.Maze, path []cells.Coordinates) maze.Maze {
-	for _, coords := range path {
-		mz.Cells[coords.Y][coords.X].Type = Path
+	for i, coords := range path {
+		switch i {
+		case 0:
+			mz.Cells[coords.Y][coords.X].Type = Start
+		case len(path) - 1:
+			mz.Cells[coords.Y][coords.X].Type = End
+		default:
+			mz.Cells[coords.Y][coords.X].Type = Path
+		}
 	}
 
 	return mz
