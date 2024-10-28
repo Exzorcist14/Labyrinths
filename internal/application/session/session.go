@@ -52,10 +52,7 @@ func (s *Session) Run() error {
 		return fmt.Errorf("can`t generate maze: %w", err)
 	}
 
-	start, end, err := s.ui.AskCoordinates(height, width) // Спрашиваем координаты начала и конца.
-	if err != nil {
-		return fmt.Errorf("can`t ask start and end coordinates: %w", err)
-	}
+	start, end := s.ui.AskCoordinates(height, width) // Спрашиваем координаты начала и конца.
 
 	path := s.solver.Solve(maze, start, end) // Ищем путь между началом и концом.
 

@@ -61,7 +61,7 @@ func (c *console) AskMazeDimensions() (height, width int, err error) {
 		return true
 	}
 
-	err = askCorrectData(
+	askCorrectData(
 		c.printf,
 		c.read,
 		"%s\n",
@@ -70,6 +70,7 @@ func (c *console) AskMazeDimensions() (height, width int, err error) {
 		areValids,
 		&width, &height,
 	)
+
 	if err != nil {
 		return height, width, fmt.Errorf("can`t ask correct data: %w", err)
 	}
@@ -78,7 +79,7 @@ func (c *console) AskMazeDimensions() (height, width int, err error) {
 }
 
 // AskCoordinates cпрашивает координаты start и end.
-func (c *console) AskCoordinates(height, width int) (start, end cells.Coordinates, err error) {
+func (c *console) AskCoordinates(height, width int) (start, end cells.Coordinates) {
 	var x, y int
 
 	areValids := func(data ...any) bool {
@@ -96,12 +97,9 @@ func (c *console) AskCoordinates(height, width int) (start, end cells.Coordinate
 		return true
 	}
 
-	err = c.printf("\n%s\n", NoteMessage)
-	if err != nil {
-		return start, end, fmt.Errorf("can`t print format data: %w", err)
-	}
+	c.printf("\n%s\n", NoteMessage)
 
-	err = askCorrectData(
+	askCorrectData(
 		c.printf,
 		c.read,
 		"%s\n",
@@ -110,16 +108,13 @@ func (c *console) AskCoordinates(height, width int) (start, end cells.Coordinate
 		areValids,
 		&x, &y,
 	)
-	if err != nil {
-		return start, end, fmt.Errorf("can`t ask correct data: %w", err)
-	}
 
 	start = cells.Coordinates{
 		X: x,
 		Y: y,
 	}
 
-	err = askCorrectData(
+	askCorrectData(
 		c.printf,
 		c.read,
 		"\n%s\n",
@@ -129,16 +124,12 @@ func (c *console) AskCoordinates(height, width int) (start, end cells.Coordinate
 		&x, &y,
 	)
 
-	if err != nil {
-		return start, end, fmt.Errorf("can`t ask correct data: %w", err)
-	}
-
 	end = cells.Coordinates{
 		X: x,
 		Y: y,
 	}
 
-	return start, end, nil
+	return start, end
 }
 
 // DisplayMaze отображает лабиринт.
@@ -154,30 +145,22 @@ func (c *console) DisplayMazeWithPath(mz maze.Maze, path []cells.Coordinates) {
 // askCorrectData спрашивает данные до тех пор, пока они не будут корректными, читая их в data...;
 // данные, которые нужно спросить, должны передаваться по указателю.
 func askCorrectData(
-	printf func(format string, a ...any) error,
+	printf func(format string, a ...any),
 	read func(data ...any) error,
 	messageFormat, message, errorMessage string,
 	areValid func(data ...any) bool,
 	data ...any,
-) error {
-	errPrint := printf(messageFormat, message)
-	if errPrint != nil {
-		return fmt.Errorf("can`t print format message: %w", errPrint)
-	}
+) {
+	printf(messageFormat, message)
 
 	for {
 		errRead := read(data...)
 		if errRead != nil || !areValid(data...) {
-			errPrint = printf("%s", errorMessage)
-			if errPrint != nil {
-				return fmt.Errorf("can`t print format errpr message: %w", errPrint)
-			}
+			printf("%s", errorMessage)
 		} else {
 			break
 		}
 	}
-
-	return nil
 }
 
 // read читает данные в data.
@@ -197,16 +180,7 @@ func (c *console) read(data ...any) error {
 }
 
 // printf выводит данные согласно формату.
-func (c *console) printf(format string, a ...any) error {
-	_, err := fmt.Fprintf(c.writer, format, a...)
-	if err != nil {
-		return fmt.Errorf("can`t write formatted data: %w", err)
-	}
-
-	err = c.writer.Flush()
-	if err != nil {
-		return fmt.Errorf("can`t flush data: %w", err)
-	}
-
-	return nil
+func (c *console) printf(format string, a ...any) {
+	fmt.Fprintf(c.writer, format, a...)
+	c.writer.Flush()
 }
