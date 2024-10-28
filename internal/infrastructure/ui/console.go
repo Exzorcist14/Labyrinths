@@ -45,7 +45,7 @@ func newConsole(rendererType string, palette renderer.Palette) *console {
 }
 
 // AskMazeDimensions cпрашивает ширину и высоту.
-func (c *console) AskMazeDimensions() (height, width int, err error) {
+func (c *console) AskMazeDimensions() (height, width int) {
 	areValids := func(data ...any) bool {
 		if len(data) != 2 {
 			return false
@@ -71,11 +71,7 @@ func (c *console) AskMazeDimensions() (height, width int, err error) {
 		&width, &height,
 	)
 
-	if err != nil {
-		return height, width, fmt.Errorf("can`t ask correct data: %w", err)
-	}
-
-	return height, width, nil
+	return height, width
 }
 
 // AskCoordinates cпрашивает координаты start и end.

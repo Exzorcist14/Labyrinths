@@ -7,7 +7,7 @@ import (
 )
 
 type UserInterface interface {
-	AskMazeDimensions() (height, width int, err error)               // Спрашивает ширину и высоту.
+	AskMazeDimensions() (height, width int)                          // Спрашивает ширину и высоту.
 	AskCoordinates(height, width int) (start, end cells.Coordinates) // Спрашивает координаты start и end.
 	DisplayMaze(mz maze.Maze)                                        // Отображает лабиринт.
 	DisplayMazeWithPath(mz maze.Maze, path []cells.Coordinates)      // Отображает лабиринт и путь на нём.

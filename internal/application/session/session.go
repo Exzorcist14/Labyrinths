@@ -42,10 +42,7 @@ func New() (*Session, error) {
 
 // Run запускает проигрывание Session.
 func (s *Session) Run() error {
-	height, width, err := s.ui.AskMazeDimensions() // Спрашиваем размеры лабиринта.
-	if err != nil {
-		return fmt.Errorf("can`t ask maze dimensions: %w", err)
-	}
+	height, width := s.ui.AskMazeDimensions() // Спрашиваем размеры лабиринта.
 
 	maze, err := s.generator.Generate(height, width) // Генерируем лабиринт.
 	if err != nil {
