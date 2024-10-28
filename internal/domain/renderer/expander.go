@@ -10,9 +10,10 @@ import (
 )
 
 const (
-	// edge - вспомогательный тип клетки, помечающий, что клетка расширенного лабиринта является ребром в исходном лабиринте.
-	edge          cells.Type = -100
-	pathToPalette string     = "./internal/infrastructure/files/palettes/expander.json" // pathToPalette - путь к палитре.
+	// Вспомогательный тип клетки, помечающий, что клетка расширенного лабиринта является ребром в исходном лабиринте.
+	edge cells.Type = -100
+	// Путь к палитре.
+	pathToPalette string = "./internal/infrastructure/files/palettes/expander.json"
 )
 
 // expanderRenderer - структура "расширяющего" рендера.
