@@ -8,7 +8,7 @@ import (
 
 // Heap - куча минимумов.
 type Heap struct {
-	heap innerHeap // Heap является обёрткой над innerHeap.
+	heap innerHeap // Heap - обёртка innerHeap, абстрагируюющая от понимания применения container/heap
 }
 
 // Item содержит координаты клетки и её тип.
