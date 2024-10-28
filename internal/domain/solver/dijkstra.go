@@ -55,7 +55,7 @@ func (s *dijkstraSolver) dijkstra(mz maze.Maze, start, end cells.Coordinates) {
 	//   3.3) Записывается координата вершины A (необходимо для восстановления пути по предшественникам).
 	//
 	// Пункты 2, 3, 4 повторяются, пока в куче существуют вершины, которые необходимо рассмотреть.
-	weight := mz.Cells[start.Y][start.X].Type
+	weight := mz.Cells[start].Type
 
 	s.dist[start] = weight
 	s.heap.Push(heaps.Item{Vertex: start, Weight: weight})
@@ -67,11 +67,11 @@ func (s *dijkstraSolver) dijkstra(mz maze.Maze, start, end cells.Coordinates) {
 			break
 		}
 
-		for _, vertex2 := range mz.Cells[vertex1.Y][vertex1.X].Transitions { // Рассматриваем смежные вершины.
+		for _, vertex2 := range mz.Cells[vertex1].Transitions { // Рассматриваем смежные вершины.
 			if s.dist[vertex2] == INF { // Если оценка пути равна INF.
-				s.dist[vertex2] = s.dist[vertex1] + mz.Cells[vertex2.Y][vertex2.X].Type // Обновляем оценку пути.
-				s.heap.Push(heaps.Item{Vertex: vertex2, Weight: s.dist[vertex2]})       // Добавляем в кучу.
-				s.predecessors[vertex2] = vertex1                                       // Записываем предшественника для vertex2.
+				s.dist[vertex2] = s.dist[vertex1] + mz.Cells[vertex2].Type        // Обновляем оценку пути.
+				s.heap.Push(heaps.Item{Vertex: vertex2, Weight: s.dist[vertex2]}) // Добавляем в кучу.
+				s.predecessors[vertex2] = vertex1                                 // Записываем предшественника для vertex2.
 			}
 		}
 	}

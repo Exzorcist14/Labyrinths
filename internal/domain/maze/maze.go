@@ -6,7 +6,7 @@ import (
 
 // Maze хранит двумерную таблицу клеток, высоту и ширину.
 type Maze struct {
-	Cells  [][]cells.Cell
+	Cells  map[cells.Coordinates]*cells.Cell
 	Height int
 	Width  int
 }
@@ -14,13 +14,15 @@ type Maze struct {
 // New возвращает инициализированный Maze.
 func New(height, width int) Maze {
 	maze := Maze{
-		Cells:  make([][]cells.Cell, height),
+		Cells:  make(map[cells.Coordinates]*cells.Cell, height*width),
 		Height: height,
 		Width:  width,
 	}
 
-	for y := 0; y < height; y++ {
-		maze.Cells[y] = make([]cells.Cell, width)
+	for x := 0; x < width; x++ {
+		for y := 0; y < height; y++ {
+			maze.Cells[cells.Coordinates{X: x, Y: y}] = &cells.Cell{}
+		}
 	}
 
 	return maze

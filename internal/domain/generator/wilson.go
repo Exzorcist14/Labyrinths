@@ -84,15 +84,8 @@ func (g *wilsonGenerator) wilson() error {
 func (g *wilsonGenerator) prepare(height, width int) {
 	g.mz = maze.New(height, width)
 
-	g.mz.Cells = make([][]cells.Cell, height)
-	for y := 0; y < height; y++ {
-		g.mz.Cells[y] = make([]cells.Cell, width)
-	}
-
-	for y := range g.mz.Cells {
-		for x := range g.mz.Cells[y] {
-			g.unvisited[cells.Coordinates{X: x, Y: y}] = struct{}{}
-		}
+	for coords := range g.mz.Cells {
+		g.unvisited[coords] = struct{}{}
 	}
 }
 
@@ -103,7 +96,7 @@ func (g *wilsonGenerator) processRandomStartingCoords() error {
 		return fmt.Errorf("can`t get random coordinates: %w", err)
 	}
 
-	g.mz.Cells[coords.Y][coords.X].Type, err = GetRandomSignificantType() // Клетка по координатам получает тип.
+	g.mz.Cells[coords].Type, err = GetRandomSignificantType() // Клетка по координатам получает тип.
 	if err != nil {
 		return fmt.Errorf("can`t get random significant type: %w", err)
 	}
@@ -167,18 +160,18 @@ func (g *wilsonGenerator) resetWandering(start cells.Coordinates) (previous cell
 func (g *wilsonGenerator) addWanderingToMaze() error {
 	var err error
 
-	for cs, transitions := range g.wandering {
-		g.mz.Cells[cs.Y][cs.X].Type, err = GetRandomSignificantType() // Клетка по координатам получает тип.
+	for coords, transitions := range g.wandering {
+		g.mz.Cells[coords].Type, err = GetRandomSignificantType() // Клетка по координатам получает тип.
 		if err != nil {
 			return fmt.Errorf("can`t get random significant type: %w", err)
 		}
 
-		g.mz.Cells[cs.Y][cs.X].Transitions = append( // Добавляем переходы, полученные в результате блуждания.
-			g.mz.Cells[cs.Y][cs.X].Transitions,
+		g.mz.Cells[coords].Transitions = append( // Добавляем переходы, полученные в результате блуждания.
+			g.mz.Cells[coords].Transitions,
 			transitions...,
 		)
 
-		delete(g.unvisited, cs) // Удаляем координаты из непосещённых.
+		delete(g.unvisited, coords) // Удаляем координаты из непосещённых.
 	}
 
 	return nil

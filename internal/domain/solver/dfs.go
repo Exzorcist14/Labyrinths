@@ -47,11 +47,11 @@ func (s *dfsSolver) dfs(current, previous, end cells.Coordinates) {
 
 	localHeap := heaps.New() // Локальная куча минимумов.
 
-	for _, next := range s.mz.Cells[current.Y][current.X].Transitions {
+	for _, next := range s.mz.Cells[current].Transitions {
 		if _, ok := s.visited[next]; !ok {
 			localHeap.Push(heaps.Item{
 				Vertex: next,
-				Weight: s.mz.Cells[next.Y][next.X].Type,
+				Weight: s.mz.Cells[next].Type,
 			})
 		}
 	}

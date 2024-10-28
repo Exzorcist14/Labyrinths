@@ -46,22 +46,19 @@ func expandPalette(palette Palette) Palette {
 func expandMaze(mz maze.Maze) maze.Maze {
 	expandedMaze := maze.New(2*mz.Height-1, 2*mz.Width-1) // Между строками и столбцами появляются новые.
 
-	for y, row := range mz.Cells {
-		for x, cell := range row {
-			expandedX := 2 * x // Отображение координаты X исходного лабиринта в расширенный.
-			expandedY := 2 * y // Отображение координаты Y исходного лабиринта в расширенный.
+	for coords, cell := range mz.Cells {
+		expandedCoords := cells.Coordinates{X: 2 * coords.X, Y: 2 * coords.Y} // Отображение координат исходного лабиринта в расширенный.
 
-			expandedMaze.Cells[expandedY][expandedX].Type = mz.Cells[y][x].Type // Перенос типа клетки.
+		expandedMaze.Cells[expandedCoords].Type = mz.Cells[coords].Type // Перенос типа клетки.
 
-			for _, adjacentCoords := range cell.Transitions {
-				expandedMaze.Cells[expandedY][expandedX].Transitions = append(
-					expandedMaze.Cells[expandedY][expandedX].Transitions,
-					cells.Coordinates{
-						X: 2 * adjacentCoords.X, // Отображение координаты X перехода исходного лабиринта в расширенный.
-						Y: 2 * adjacentCoords.Y, // Отображение координаты Y перехода исходного лабиринта в расширенный.
-					},
-				)
-			}
+		for _, adjacentCoords := range cell.Transitions {
+			expandedMaze.Cells[expandedCoords].Transitions = append(
+				expandedMaze.Cells[expandedCoords].Transitions,
+				cells.Coordinates{
+					X: 2 * adjacentCoords.X, // Отображение координаты X клетки, куда есть переход исходного лабиринта в расширенный.
+					Y: 2 * adjacentCoords.Y, // Отображение координаты Y клетки, куда есть переход исходного лабиринта в расширенный.
+				},
+			)
 		}
 	}
 
@@ -70,34 +67,32 @@ func expandMaze(mz maze.Maze) maze.Maze {
 
 // cutEdges возвращает лабиринт, в котором между отображёнными в расширенный клетками появляются клетки типа transition.
 func cutEdges(mz maze.Maze) maze.Maze {
-	for y, row := range mz.Cells {
-		for x, cell := range row {
-			if x%2 == 0 && y%2 == 0 { // По формуле отображения лишь чётные координаты имеют смысловую нагрузку.
-				for _, adjacentCoords := range cell.Transitions {
-					edgeCoords := cells.Coordinates{
-						X: (x + adjacentCoords.X) / 2, // X получается по формуле середины отрезка.
-						Y: (y + adjacentCoords.Y) / 2, // Y получается по формуле середины отрезка.
-					}
-
-					_, ok1 := pathParts[cell.Type]
-					_, ok2 := pathParts[mz.Cells[adjacentCoords.Y][adjacentCoords.X].Type]
-
-					if ok1 && ok2 { // Если прорезаемое ребро принадлежит пути.
-						mz.Cells[edgeCoords.Y][edgeCoords.X].Type = Path
-					} else {
-						mz.Cells[edgeCoords.Y][edgeCoords.X].Type = transition
-					}
-
-					mz.Cells[edgeCoords.Y][edgeCoords.X].Transitions = append(
-						mz.Cells[edgeCoords.Y][edgeCoords.X].Transitions,
-						cells.Coordinates{X: x, Y: y},
-					)
-
-					mz.Cells[y][x].Transitions = append(
-						mz.Cells[y][x].Transitions,
-						edgeCoords,
-					)
+	for coords, cell := range mz.Cells {
+		if coords.X%2 == 0 && coords.Y%2 == 0 { // По формуле отображения лишь чётные координаты имеют смысловую нагрузку.
+			for _, adjacentCoords := range cell.Transitions {
+				edgeCoords := cells.Coordinates{
+					X: (coords.X + adjacentCoords.X) / 2, // X получается по формуле середины отрезка.
+					Y: (coords.Y + adjacentCoords.Y) / 2, // Y получается по формуле середины отрезка.
 				}
+
+				_, ok1 := pathParts[cell.Type]
+				_, ok2 := pathParts[mz.Cells[adjacentCoords].Type]
+
+				if ok1 && ok2 { // Если прорезаемое ребро принадлежит пути.
+					mz.Cells[edgeCoords].Type = Path
+				} else {
+					mz.Cells[edgeCoords].Type = transition
+				}
+
+				mz.Cells[edgeCoords].Transitions = append(
+					mz.Cells[edgeCoords].Transitions,
+					cells.Coordinates{X: coords.X, Y: coords.Y},
+				)
+
+				mz.Cells[coords].Transitions = append(
+					mz.Cells[coords].Transitions,
+					edgeCoords,
+				)
 			}
 		}
 	}
@@ -110,11 +105,11 @@ func overlayPath(mz maze.Maze, path []cells.Coordinates) maze.Maze {
 	for i, coords := range path {
 		switch i {
 		case 0:
-			mz.Cells[coords.Y][coords.X].Type = Start
+			mz.Cells[coords].Type = Start
 		case len(path) - 1:
-			mz.Cells[coords.Y][coords.X].Type = End
+			mz.Cells[coords].Type = End
 		default:
-			mz.Cells[coords.Y][coords.X].Type = Path
+			mz.Cells[coords].Type = Path
 		}
 	}
 
@@ -125,9 +120,9 @@ func overlayPath(mz maze.Maze, path []cells.Coordinates) maze.Maze {
 func convertToString(mz maze.Maze, palette Palette) string {
 	var result strings.Builder
 
-	for _, row := range mz.Cells {
-		for _, cell := range row {
-			result.WriteString(palette[cell.Type])
+	for y := range mz.Height {
+		for x := range mz.Width {
+			result.WriteString(palette[mz.Cells[cells.Coordinates{X: x, Y: y}].Type])
 		}
 
 		result.WriteString("\n")

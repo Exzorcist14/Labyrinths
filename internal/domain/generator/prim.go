@@ -63,7 +63,7 @@ func (g *primGenerator) prim() error {
 			return fmt.Errorf("can`get random available border coordinates: %w", err)
 		}
 
-		g.mz.Cells[current.Y][current.X].Type, err = GetRandomSignificantType() // Клетка по координатам получает тип.
+		g.mz.Cells[current].Type, err = GetRandomSignificantType() // Клетка по координатам получает тип.
 		if err != nil {
 			return fmt.Errorf("can`t get random significant type: %w", err)
 		}
@@ -82,11 +82,6 @@ func (g *primGenerator) prim() error {
 // prepare подготавливает primGenerator для исполнения Generate.
 func (g *primGenerator) prepare(height, width int) {
 	g.mz = maze.New(height, width)
-
-	g.mz.Cells = make([][]cells.Cell, height)
-	for y := 0; y < height; y++ {
-		g.mz.Cells[y] = make([]cells.Cell, width)
-	}
 }
 
 // linkToPassage связывает клетку со случайным смежным проходом лабиринта.
@@ -97,13 +92,13 @@ func (g *primGenerator) linkToPassage(newPassage cells.Coordinates) error {
 	}
 
 	if previousPassage.X != -1 {
-		g.mz.Cells[newPassage.Y][newPassage.X].Transitions = append(
-			g.mz.Cells[newPassage.Y][newPassage.X].Transitions,
+		g.mz.Cells[newPassage].Transitions = append(
+			g.mz.Cells[newPassage].Transitions,
 			previousPassage,
 		)
 
-		g.mz.Cells[previousPassage.Y][previousPassage.X].Transitions = append(
-			g.mz.Cells[previousPassage.Y][previousPassage.X].Transitions,
+		g.mz.Cells[previousPassage].Transitions = append(
+			g.mz.Cells[previousPassage].Transitions,
 			newPassage,
 		)
 	}
@@ -117,7 +112,7 @@ func (g *primGenerator) updateBorder(coords cells.Coordinates) {
 		newCoords := cells.Coordinates{X: coords.X + dx[i], Y: coords.Y + dy[i]}
 
 		if IsInside(newCoords, g.mz.Height, g.mz.Width) &&
-			g.mz.Cells[newCoords.Y][newCoords.X].Type == cells.Wall { // Если не является проходом.
+			g.mz.Cells[newCoords].Type == cells.Wall { // Если не является проходом.
 			g.border[newCoords] = struct{}{}
 		}
 	}
@@ -133,7 +128,7 @@ func (g *primGenerator) getRandomAdjacentPassageCoords(coords cells.Coordinates)
 		adjacentCoords := cells.Coordinates{X: coords.X + dx[i], Y: coords.Y + dy[i]}
 
 		if IsInside(adjacentCoords, g.mz.Height, g.mz.Width) &&
-			g.mz.Cells[adjacentCoords.Y][adjacentCoords.X].Type != cells.Wall {
+			g.mz.Cells[adjacentCoords].Type != cells.Wall {
 			adjacentPassagesCoords = append(adjacentPassagesCoords, adjacentCoords)
 		}
 	}
