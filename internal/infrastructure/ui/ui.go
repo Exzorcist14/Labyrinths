@@ -1,9 +1,10 @@
 package ui
 
 import (
+	"fmt"
+
 	"github.com/es-debug/backend-academy-2024-go-template/internal/domain/maze"
 	"github.com/es-debug/backend-academy-2024-go-template/internal/domain/maze/cells"
-	"github.com/es-debug/backend-academy-2024-go-template/internal/domain/renderer"
 )
 
 type UserInterface interface {
@@ -14,11 +15,21 @@ type UserInterface interface {
 }
 
 // New как фабрика возвращает конкретную реализацию UserInterface по строке, обозначающей желаемую реализацию.
-func New(consoleType, rendererType string, palette renderer.Palette) UserInterface {
+func New(consoleType, rendererType string) (UserInterface, error) {
 	switch consoleType {
 	case "console":
-		return newConsole(rendererType, palette)
+		c, err := newConsole(rendererType)
+		if err != nil {
+			return nil, fmt.Errorf("can`t initialize console: %w", err)
+		}
+
+		return c, nil
 	default:
-		return newConsole(rendererType, palette)
+		c, err := newConsole(rendererType)
+		if err != nil {
+			return nil, fmt.Errorf("can`t initialize console: %w", err)
+		}
+
+		return c, nil
 	}
 }

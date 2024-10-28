@@ -1,6 +1,8 @@
 package renderer
 
 import (
+	"fmt"
+
 	"github.com/es-debug/backend-academy-2024-go-template/internal/domain/maze"
 	"github.com/es-debug/backend-academy-2024-go-template/internal/domain/maze/cells"
 )
@@ -11,11 +13,21 @@ type Renderer interface {
 }
 
 // New как фабрика возвращает конкретную реализацию Renderer по строке, обозначающей желаемую реализацию, и палитре.
-func New(rendererType string, palette Palette) Renderer {
+func New(rendererType string) (Renderer, error) {
 	switch rendererType {
 	case "expander":
-		return newExpanderRenderer(palette)
+		renderer, err := newExpanderRenderer()
+		if err != nil {
+			return nil, fmt.Errorf("can`t initialize expander renderer: %v", err)
+		}
+
+		return renderer, nil
 	default:
-		return newExpanderRenderer(palette)
+		renderer, err := newExpanderRenderer()
+		if err != nil {
+			return nil, fmt.Errorf("can`t initialize expander renderer: %v", err)
+		}
+
+		return renderer, nil
 	}
 }

@@ -35,13 +35,21 @@ type console struct {
 	renderer renderer.Renderer
 }
 
-// newConsole возвращает указатель на инициализированную структуру консоли.
-func newConsole(rendererType string, palette renderer.Palette) *console {
-	return &console{
-		reader:   bufio.NewReader(os.Stdin),
-		writer:   bufio.NewWriter(os.Stdout),
-		renderer: renderer.New(rendererType, palette),
+// newConsole возвращает указатель на инициализированный console.
+func newConsole(rendererType string) (*console, error) {
+	var err error
+
+	c := console{
+		reader: bufio.NewReader(os.Stdin),
+		writer: bufio.NewWriter(os.Stdout),
 	}
+
+	c.renderer, err = renderer.New(rendererType)
+	if err != nil {
+		return nil, fmt.Errorf("can`t initialize renderer: %w", err)
+	}
+
+	return &c, nil
 }
 
 // AskMazeDimensions cпрашивает ширину и высоту.

@@ -1,25 +1,35 @@
 package renderer
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/es-debug/backend-academy-2024-go-template/internal/domain/maze"
 	"github.com/es-debug/backend-academy-2024-go-template/internal/domain/maze/cells"
+	"github.com/es-debug/backend-academy-2024-go-template/internal/infrastructure/file"
 )
 
-// transition - вспомогательная константа типа клетки, необходимая для пометки о том, что клетка является переходом.
-const transition cells.Type = -2
+const (
+	// edge - вспомогательный тип клетки, помечающий, что клетка расширенного лабиринта является ребром в исходном лабиринте.
+	edge          cells.Type = -100
+	pathToPalette string     = "./internal/infrastructure/files/palettes/expander.json" // pathToPalette - путь к палитре.
+)
 
 // expanderRenderer - структура "расширяющего" рендера.
 type expanderRenderer struct {
 	palette Palette
 }
 
-// newExpanderRenderer возвращает указатель на новый expanderRenderer.
-func newExpanderRenderer(palette Palette) *expanderRenderer {
-	return &expanderRenderer{
-		palette: expandPalette(palette),
+// newExpanderRenderer возвращает указатель на инициализированный expanderRenderer.
+func newExpanderRenderer() (*expanderRenderer, error) {
+	eR := expanderRenderer{}
+
+	err := file.LoadData(pathToPalette, &eR.palette)
+	if err != nil {
+		return nil, fmt.Errorf("can`t load expander palette: %w", err)
 	}
+
+	return &eR, nil
 }
 
 // Render отображает лабиринт в готовую для визуализации строку и возвращает её.
@@ -30,16 +40,6 @@ func (r *expanderRenderer) Render(mz maze.Maze) string {
 // RenderPath отображает лабиринт и путь в нём в готовую для визуализации строку и возвращает её.
 func (r *expanderRenderer) RenderPath(mz maze.Maze, path []cells.Coordinates) string {
 	return convertToString(expandMaze(overlayPath(mz, path)), r.palette)
-}
-
-// expandPalette возвращает расширенную визуализацией вспомогательных типов палитру.
-func expandPalette(palette Palette) Palette {
-	palette[transition] = "\U0001F532" // 🔲
-	palette[Start] = "⭐"               // ⭐
-	palette[End] = "🚩"                 // 🚩
-	palette[Path] = "\U0001F7E9"       // 🟩
-
-	return palette
 }
 
 // expandMaze возвращает расширенный лабиринт, в котором появляются стены.
@@ -65,7 +65,7 @@ func expandMaze(mz maze.Maze) maze.Maze {
 	return cutEdges(expandedMaze)
 }
 
-// cutEdges возвращает лабиринт, в котором между отображёнными в расширенный клетками появляются клетки типа transition.
+// cutEdges возвращает лабиринт, в котором между отображёнными в расширенный клетками появляются клетки типа edge.
 func cutEdges(mz maze.Maze) maze.Maze {
 	for coords, cell := range mz.Cells {
 		if coords.X%2 == 0 && coords.Y%2 == 0 { // По формуле отображения лишь чётные координаты имеют смысловую нагрузку.
@@ -81,7 +81,7 @@ func cutEdges(mz maze.Maze) maze.Maze {
 				if ok1 && ok2 { // Если прорезаемое ребро принадлежит пути.
 					mz.Cells[edgeCoords].Type = Path
 				} else {
-					mz.Cells[edgeCoords].Type = transition
+					mz.Cells[edgeCoords].Type = edge
 				}
 
 				mz.Cells[edgeCoords].Transitions = append(

@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/es-debug/backend-academy-2024-go-template/internal/domain/generator"
-	"github.com/es-debug/backend-academy-2024-go-template/internal/domain/renderer"
 	"github.com/es-debug/backend-academy-2024-go-template/internal/domain/solver"
 	"github.com/es-debug/backend-academy-2024-go-template/internal/infrastructure/config"
 	"github.com/es-debug/backend-academy-2024-go-template/internal/infrastructure/file"
@@ -21,23 +20,23 @@ type Session struct {
 // New возвращает инициализированную структуру Session.
 func New() (*Session, error) {
 	cfg := config.Config{}
-	palette := renderer.Palette{}
 
 	err := file.LoadData("./internal/infrastructure/files/config.json", &cfg)
 	if err != nil {
 		return nil, fmt.Errorf("can`t load config: %w", err)
 	}
 
-	err = file.LoadData("./internal/infrastructure/files/palette.json", &palette)
-	if err != nil {
-		return nil, fmt.Errorf("can`t load palette: %w", err)
-	}
-
-	return &Session{
+	s := Session{
 		generator: generator.New(cfg.GeneratorType),
 		solver:    solver.New(cfg.SolverType),
-		ui:        ui.New(cfg.UIType, cfg.RendererType, palette),
-	}, nil
+	}
+
+	s.ui, err = ui.New(cfg.UIType, cfg.RendererType)
+	if err != nil {
+		return nil, fmt.Errorf("can`t initialize ui: %w", err)
+	}
+
+	return &s, nil
 }
 
 // Run запускает проигрывание Session.
