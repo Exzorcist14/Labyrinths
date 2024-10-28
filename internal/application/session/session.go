@@ -10,6 +10,8 @@ import (
 	"github.com/es-debug/backend-academy-2024-go-template/internal/infrastructure/ui"
 )
 
+const pathToConfig = "./internal/infrastructure/files/config.json"
+
 // Session хранит генератор, решатель и пользовательский интерфейс.
 type Session struct {
 	generator generator.Generator
@@ -21,7 +23,7 @@ type Session struct {
 func New() (*Session, error) {
 	cfg := config.Config{}
 
-	err := file.LoadData("./internal/infrastructure/files/config.json", &cfg)
+	err := file.LoadData(pathToConfig, &cfg)
 	if err != nil {
 		return nil, fmt.Errorf("can`t load config: %w", err)
 	}
