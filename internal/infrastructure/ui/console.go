@@ -24,7 +24,7 @@ type reader interface {
 }
 
 type writer interface {
-	Write(p []byte) (nn int, err error)
+	Write(p []byte) (n int, err error)
 	Flush() error
 }
 
@@ -54,7 +54,7 @@ func newConsole(rendererType string) (*console, error) {
 
 // AskMazeDimensions cпрашивает ширину и высоту.
 func (c *console) AskMazeDimensions() (height, width int) {
-	areValids := func(data ...any) bool {
+	areValid := func(data ...any) bool {
 		if len(data) != 2 {
 			return false
 		}
@@ -69,13 +69,13 @@ func (c *console) AskMazeDimensions() (height, width int) {
 		return true
 	}
 
-	askCorrectData(
+	AskCorrectData(
 		c.printf,
 		c.read,
+		areValid,
 		"%s\n",
 		DimensionsInputMessage,
 		ErrorDimensionsInputMessage,
-		areValids,
 		&width, &height,
 	)
 
@@ -86,7 +86,7 @@ func (c *console) AskMazeDimensions() (height, width int) {
 func (c *console) AskCoordinates(height, width int) (start, end cells.Coordinates) {
 	var x, y int
 
-	areValids := func(data ...any) bool {
+	areValid := func(data ...any) bool {
 		if len(data) != 2 {
 			return false
 		}
@@ -103,13 +103,13 @@ func (c *console) AskCoordinates(height, width int) (start, end cells.Coordinate
 
 	c.printf("\n%s\n", NoteMessage)
 
-	askCorrectData(
+	AskCorrectData(
 		c.printf,
 		c.read,
+		areValid,
 		"%s\n",
 		StartInputMessage,
 		ErrorCoordinatesInputMessage,
-		areValids,
 		&x, &y,
 	)
 
@@ -118,13 +118,13 @@ func (c *console) AskCoordinates(height, width int) (start, end cells.Coordinate
 		Y: y,
 	}
 
-	askCorrectData(
+	AskCorrectData(
 		c.printf,
 		c.read,
+		areValid,
 		"\n%s\n",
 		EndInputMessage,
 		ErrorCoordinatesInputMessage,
-		areValids,
 		&x, &y,
 	)
 
@@ -146,19 +146,20 @@ func (c *console) DisplayMazeWithPath(mz maze.Maze, path []cells.Coordinates) {
 	c.printf("\n%s\n", c.renderer.RenderPath(mz, path))
 }
 
-// askCorrectData спрашивает данные до тех пор, пока они не будут корректными, читая их в data...;
+// AskCorrectData спрашивает данные до тех пор, пока они не будут корректными, читая их в data...;
 // данные, которые нужно спросить, должны передаваться по указателю.
-func askCorrectData(
+func AskCorrectData(
 	printf func(format string, a ...any),
 	read func(data ...any) error,
-	messageFormat, message, errorMessage string,
 	areValid func(data ...any) bool,
+	messageFormat, message, errorMessage string,
 	data ...any,
 ) {
 	printf(messageFormat, message)
 
 	for {
 		errRead := read(data...)
+
 		if errRead != nil || !areValid(data...) {
 			printf("%s", errorMessage)
 		} else {
