@@ -7,6 +7,7 @@ import (
 )
 
 // LoadData считывает файл по указанному path и десереализует данные в target.
+// target должен передаваться по указателю.
 func LoadData(path string, target any) error {
 	data, err := os.ReadFile(path)
 	if err != nil {
