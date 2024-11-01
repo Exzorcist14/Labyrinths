@@ -1,12 +1,12 @@
-package solver
+package solvers
 
 import (
 	"math"
 
 	"github.com/es-debug/backend-academy-2024-go-template/internal/domain/maze"
 	"github.com/es-debug/backend-academy-2024-go-template/internal/domain/maze/cells"
-	"github.com/es-debug/backend-academy-2024-go-template/internal/domain/solver/sutils"
-	"github.com/es-debug/backend-academy-2024-go-template/internal/domain/solver/sutils/heaps"
+	"github.com/es-debug/backend-academy-2024-go-template/internal/domain/solvers/sutils"
+	"github.com/es-debug/backend-academy-2024-go-template/internal/domain/solvers/sutils/heaps"
 )
 
 // INF обозначает ненайденную дистанцию.

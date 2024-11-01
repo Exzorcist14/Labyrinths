@@ -1,4 +1,4 @@
-package renderer
+package renderers
 
 import "github.com/es-debug/backend-academy-2024-go-template/internal/domain/maze/cells"
 

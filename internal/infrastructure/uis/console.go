@@ -1,4 +1,4 @@
-package ui
+package uis
 
 import (
 	"bufio"
@@ -7,7 +7,6 @@ import (
 
 	"github.com/es-debug/backend-academy-2024-go-template/internal/domain/maze"
 	"github.com/es-debug/backend-academy-2024-go-template/internal/domain/maze/cells"
-	"github.com/es-debug/backend-academy-2024-go-template/internal/domain/renderer"
 )
 
 const (
@@ -32,24 +31,16 @@ type writer interface {
 type console struct {
 	reader   reader
 	writer   writer
-	renderer renderer.Renderer
+	renderer renderer
 }
 
 // newConsole возвращает указатель на инициализированный console.
-func newConsole(rendererType string) (*console, error) {
-	var err error
-
-	c := console{
-		reader: bufio.NewReader(os.Stdin),
-		writer: bufio.NewWriter(os.Stdout),
+func newConsole(r renderer) *console {
+	return &console{
+		reader:   bufio.NewReader(os.Stdin),
+		writer:   bufio.NewWriter(os.Stdout),
+		renderer: r,
 	}
-
-	c.renderer, err = renderer.New(rendererType)
-	if err != nil {
-		return nil, fmt.Errorf("can`t initialize renderer: %w", err)
-	}
-
-	return &c, nil
 }
 
 // AskMazeDimensions cпрашивает ширину и высоту.

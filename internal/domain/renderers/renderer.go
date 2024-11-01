@@ -1,4 +1,4 @@
-package renderer
+package renderers
 
 import (
 	"fmt"
@@ -7,27 +7,27 @@ import (
 	"github.com/es-debug/backend-academy-2024-go-template/internal/domain/maze/cells"
 )
 
-type Renderer interface {
+type renderer interface {
 	Render(mz maze.Maze) string                               // Отображает лабиринт в готовую для визуализации строку.
 	RenderPath(mz maze.Maze, path []cells.Coordinates) string // Отображает лабиринт и путь в готовую для визуализации строку.
 }
 
-// New как фабрика возвращает конкретную реализацию Renderer по строке, обозначающей желаемую реализацию, и палитре.
-func New(rendererType string) (Renderer, error) {
+// New как фабрика возвращает конкретную реализацию renderers по строке, обозначающей желаемую реализацию, и палитре.
+func New(rendererType string) (renderer, error) {
 	switch rendererType {
 	case "expander":
-		renderer, err := newExpanderRenderer()
+		r, err := newExpanderRenderer()
 		if err != nil {
-			return nil, fmt.Errorf("can`t initialize expander renderer: %v", err)
+			return nil, fmt.Errorf("can`t initialize expander renderers: %v", err)
 		}
 
-		return renderer, nil
+		return r, nil
 	default:
-		renderer, err := newExpanderRenderer()
+		r, err := newExpanderRenderer()
 		if err != nil {
-			return nil, fmt.Errorf("can`t initialize expander renderer: %v", err)
+			return nil, fmt.Errorf("can`t initialize expander renderers: %v", err)
 		}
 
-		return renderer, nil
+		return r, nil
 	}
 }

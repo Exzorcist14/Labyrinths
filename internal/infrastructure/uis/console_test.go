@@ -1,10 +1,10 @@
-package ui_test
+package uis_test
 
 import (
 	"errors"
 	"testing"
 
-	"github.com/es-debug/backend-academy-2024-go-template/internal/infrastructure/ui"
+	"github.com/es-debug/backend-academy-2024-go-template/internal/infrastructure/uis"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -118,7 +118,7 @@ func Test_askCorrectData(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ui.AskCorrectData(
+			uis.AskCorrectData(
 				tt.args.printf,
 				tt.args.read,
 				tt.args.areValid,
