@@ -1,27 +1,28 @@
-package generators
+package prim
 
 import (
 	"fmt"
 
+	"github.com/es-debug/backend-academy-2024-go-template/internal/domain/generators/gutils"
 	"github.com/es-debug/backend-academy-2024-go-template/internal/domain/maze"
 	"github.com/es-debug/backend-academy-2024-go-template/internal/domain/maze/cells"
 )
 
-// primGenerator - структура генератора по алгоритму Прима.
-type primGenerator struct {
+// Generator - структура генератора по алгоритму Прима.
+type Generator struct {
 	border map[cells.Coordinates]struct{} // множество координат пограничных клеток
 	mz     maze.Maze
 }
 
-// newPrimGenerator возвращает указатель на новый primGenerator.
-func newPrimGenerator() *primGenerator {
-	return &primGenerator{
+// NewPrimGenerator возвращает указатель на новый primGenerator.
+func NewPrimGenerator() *Generator {
+	return &Generator{
 		border: make(map[cells.Coordinates]struct{}),
 	}
 }
 
 // Generate генерирует лабиринт заданной высоты и ширины.
-func (g *primGenerator) Generate(height, width int) (maze.Maze, error) {
+func (g *Generator) Generate(height, width int) (maze.Maze, error) {
 	g.prepare(height, width)
 
 	err := g.prim()
@@ -33,7 +34,7 @@ func (g *primGenerator) Generate(height, width int) (maze.Maze, error) {
 }
 
 // prim генерирует лабиринт по алгоритму Прима.
-func (g *primGenerator) prim() error {
+func (g *Generator) prim() error {
 	// Суть алгоритма Прима (в текущей реализации):
 	//
 	// Изначально ни одна клетка не принадлежит лабиринту.
@@ -50,7 +51,7 @@ func (g *primGenerator) prim() error {
 	//
 	// Итак, изначально все клетки лабиринта являются стенами ("лабиринт" пуст), которые будут заменяться проходами.
 	// В дальнейшем под лабиринтом будет пониматься именно множество проходов.
-	current, err := GetRandomCoords(g.mz.Height, g.mz.Width) // Выбираем случайную клетку.
+	current, err := gutils.GetRandomCoords(g.mz.Height, g.mz.Width) // Выбираем случайную клетку.
 	if err != nil {
 		return fmt.Errorf("can`t get random coordinates: %w", err)
 	}
@@ -58,12 +59,12 @@ func (g *primGenerator) prim() error {
 	g.border[current] = struct{}{} // Клетка становится пограничной.
 
 	for len(g.border) != 0 { // Пока есть пограничные клетки:
-		current, err = GetRandomCoordsFrom(g.border) // Получаем случайную координаты пограничной клетки.
+		current, err = gutils.GetRandomCoordsFrom(g.border) // Получаем случайную координаты пограничной клетки.
 		if err != nil {
 			return fmt.Errorf("can`get random available border coordinates: %w", err)
 		}
 
-		g.mz.Cells[current].Type, err = GetRandomSignificantType() // Клетка по координатам получает тип.
+		g.mz.Cells[current].Type, err = gutils.GetRandomSignificantType() // Клетка по координатам получает тип.
 		if err != nil {
 			return fmt.Errorf("can`t get random significant type: %w", err)
 		}
@@ -79,13 +80,13 @@ func (g *primGenerator) prim() error {
 	return nil
 }
 
-// prepare подготавливает primGenerator для исполнения Generate.
-func (g *primGenerator) prepare(height, width int) {
+// prepare подготавливает Generator для исполнения Generate.
+func (g *Generator) prepare(height, width int) {
 	g.mz = maze.New(height, width)
 }
 
 // linkToPassage связывает клетку со случайным смежным проходом лабиринта.
-func (g *primGenerator) linkToPassage(newPassage cells.Coordinates) error {
+func (g *Generator) linkToPassage(newPassage cells.Coordinates) error {
 	previousPassage, err := g.getRandomAdjacentPassageCoords(newPassage)
 	if err != nil {
 		return fmt.Errorf("can`t get random adjacent passage current: %w", err)
@@ -107,11 +108,11 @@ func (g *primGenerator) linkToPassage(newPassage cells.Coordinates) error {
 }
 
 // updateBorder обновляет множество пограничных клеток, добавляя новые и удаляя текущую.
-func (g *primGenerator) updateBorder(coords cells.Coordinates) {
-	for i := 0; i < len(dx); i++ {
-		newCoords := cells.Coordinates{X: coords.X + dx[i], Y: coords.Y + dy[i]}
+func (g *Generator) updateBorder(coords cells.Coordinates) {
+	for i := 0; i < len(gutils.Dx); i++ {
+		newCoords := cells.Coordinates{X: coords.X + gutils.Dx[i], Y: coords.Y + gutils.Dy[i]}
 
-		if IsInside(newCoords, g.mz.Height, g.mz.Width) &&
+		if gutils.IsInside(newCoords, g.mz.Height, g.mz.Width) &&
 			g.mz.Cells[newCoords].Type == cells.Wall { // Если не является проходом.
 			g.border[newCoords] = struct{}{}
 		}
@@ -121,20 +122,20 @@ func (g *primGenerator) updateBorder(coords cells.Coordinates) {
 }
 
 // getRandomAdjacentPassageCoords возвращает координаты случайной смежной клетки, являющейся проходом.
-func (g *primGenerator) getRandomAdjacentPassageCoords(coords cells.Coordinates) (cells.Coordinates, error) {
+func (g *Generator) getRandomAdjacentPassageCoords(coords cells.Coordinates) (cells.Coordinates, error) {
 	adjacentPassagesCoords := []cells.Coordinates{}
 
-	for i := range dx { // Заполняем слайс смежных проходов.
-		adjacentCoords := cells.Coordinates{X: coords.X + dx[i], Y: coords.Y + dy[i]}
+	for i := range gutils.Dx { // Заполняем слайс смежных проходов.
+		adjacentCoords := cells.Coordinates{X: coords.X + gutils.Dx[i], Y: coords.Y + gutils.Dy[i]}
 
-		if IsInside(adjacentCoords, g.mz.Height, g.mz.Width) &&
+		if gutils.IsInside(adjacentCoords, g.mz.Height, g.mz.Width) &&
 			g.mz.Cells[adjacentCoords].Type != cells.Wall {
 			adjacentPassagesCoords = append(adjacentPassagesCoords, adjacentCoords)
 		}
 	}
 
 	if len(adjacentPassagesCoords) != 0 {
-		number, err := GetRandomInt(len(adjacentPassagesCoords)) // Получаем случайный номер прохода.
+		number, err := gutils.GetRandomInt(len(adjacentPassagesCoords)) // Получаем случайный номер прохода.
 		if err != nil {
 			return cells.Coordinates{}, fmt.Errorf("can`t generate random number of adjacent passage: %w", err)
 		}

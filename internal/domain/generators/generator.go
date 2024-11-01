@@ -1,6 +1,8 @@
 package generators
 
 import (
+	"github.com/es-debug/backend-academy-2024-go-template/internal/domain/generators/prim"
+	"github.com/es-debug/backend-academy-2024-go-template/internal/domain/generators/wilson"
 	"github.com/es-debug/backend-academy-2024-go-template/internal/domain/maze"
 )
 
@@ -12,10 +14,10 @@ type generator interface {
 func New(generatorType string) generator {
 	switch generatorType {
 	case "prim":
-		return newPrimGenerator()
+		return prim.NewPrimGenerator()
 	case "wilson":
-		return newWilsonGenerator()
+		return wilson.NewWilsonGenerator()
 	default:
-		return newPrimGenerator()
+		return prim.NewPrimGenerator()
 	}
 }

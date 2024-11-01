@@ -1,29 +1,30 @@
-package generators
+package wilson
 
 import (
 	"fmt"
 
+	"github.com/es-debug/backend-academy-2024-go-template/internal/domain/generators/gutils"
 	"github.com/es-debug/backend-academy-2024-go-template/internal/domain/maze"
 	"github.com/es-debug/backend-academy-2024-go-template/internal/domain/maze/cells"
 )
 
-// wilsonGenerator - структура генератора по алгоритму Уилсона.
-type wilsonGenerator struct {
+// Generator - структура генератора по алгоритму Уилсона.
+type Generator struct {
 	unvisited map[cells.Coordinates]struct{}            // Множество непосещённых координат.
 	wandering map[cells.Coordinates][]cells.Coordinates // Словарь координаты - координаты, к которым есть переход.
 	mz        maze.Maze
 }
 
-// newWilsonGenerator возвращает указатель на новый wilsonGenerator.
-func newWilsonGenerator() *wilsonGenerator {
-	return &wilsonGenerator{
+// NewWilsonGenerator возвращает указатель на новый Generator.
+func NewWilsonGenerator() *Generator {
+	return &Generator{
 		unvisited: make(map[cells.Coordinates]struct{}),
 		wandering: make(map[cells.Coordinates][]cells.Coordinates),
 	}
 }
 
 // Generate генерирует лабиринт заданной высоты и ширины.
-func (g *wilsonGenerator) Generate(height, width int) (maze.Maze, error) {
+func (g *Generator) Generate(height, width int) (maze.Maze, error) {
 	g.prepare(height, width)
 
 	err := g.wilson()
@@ -35,7 +36,7 @@ func (g *wilsonGenerator) Generate(height, width int) (maze.Maze, error) {
 }
 
 // wilson генерирует лабиринт по алгоритму Уилсона.
-func (g *wilsonGenerator) wilson() error {
+func (g *Generator) wilson() error {
 	// Алгоритм Уилсона отличается тем, что генерирует несмещенную выборку из равномерного распределения
 	// по всем лабиринтам, используя случайные блуждания с удалением петель,
 	// хотя и имеет значительно более высокую временную сложность.
@@ -80,8 +81,8 @@ func (g *wilsonGenerator) wilson() error {
 	return nil
 }
 
-// prepare подготавливает wilsonGenerator для исполнения Generate.
-func (g *wilsonGenerator) prepare(height, width int) {
+// prepare подготавливает Generator для исполнения Generate.
+func (g *Generator) prepare(height, width int) {
 	g.mz = maze.New(height, width)
 
 	for coords := range g.mz.Cells {
@@ -90,13 +91,13 @@ func (g *wilsonGenerator) prepare(height, width int) {
 }
 
 // processRandomStartingCoords выбирает и обрабатывает случайные стартовые координаты.
-func (g *wilsonGenerator) processRandomStartingCoords() error {
-	coords, err := GetRandomCoords(g.mz.Height, g.mz.Width) // Выбираем случайные координаты.
+func (g *Generator) processRandomStartingCoords() error {
+	coords, err := gutils.GetRandomCoords(g.mz.Height, g.mz.Width) // Выбираем случайные координаты.
 	if err != nil {
 		return fmt.Errorf("can`t get random coordinates: %w", err)
 	}
 
-	g.mz.Cells[coords].Type, err = GetRandomSignificantType() // Клетка по координатам получает тип.
+	g.mz.Cells[coords].Type, err = gutils.GetRandomSignificantType() // Клетка по координатам получает тип.
 	if err != nil {
 		return fmt.Errorf("can`t get random significant type: %w", err)
 	}
@@ -107,7 +108,7 @@ func (g *wilsonGenerator) processRandomStartingCoords() error {
 }
 
 // randomlyWander случайно блуждает, пока не встретит часть лабиринта.
-func (g *wilsonGenerator) randomlyWander() error {
+func (g *Generator) randomlyWander() error {
 	var (
 		start    cells.Coordinates
 		current  cells.Coordinates
@@ -115,7 +116,7 @@ func (g *wilsonGenerator) randomlyWander() error {
 		err      error
 	)
 
-	start, err = GetRandomCoordsFrom(g.unvisited) // Получаем координаты начала блуждания случайной непосещённый клетки.
+	start, err = gutils.GetRandomCoordsFrom(g.unvisited) // Получаем координаты начала блуждания случайной непосещённый клетки.
 	if err != nil {
 		return fmt.Errorf("can`t get random coordinates: %w", err)
 	}
@@ -124,7 +125,7 @@ func (g *wilsonGenerator) randomlyWander() error {
 	_, notMaze := g.unvisited[start]
 
 	for notMaze { // Пока полученные координаты не относятся к лабиринту.
-		current, err = GetRandomAdjacentCoords(previous, g.mz.Height, g.mz.Width)
+		current, err = gutils.GetRandomAdjacentCoords(previous, g.mz.Height, g.mz.Width)
 		if err != nil {
 			return fmt.Errorf("can`t get random coordinates: %w", err)
 		}
@@ -143,7 +144,7 @@ func (g *wilsonGenerator) randomlyWander() error {
 }
 
 // addCoordsToWandering добавляет координаты в блуждание, обновляя слайсы переходов wandering генератора.
-func (g *wilsonGenerator) addCoordsToWandering(current, previous cells.Coordinates) {
+func (g *Generator) addCoordsToWandering(current, previous cells.Coordinates) {
 	if current != previous {
 		g.wandering[current] = append(g.wandering[current], previous)
 		g.wandering[previous] = append(g.wandering[previous], current)
@@ -151,17 +152,17 @@ func (g *wilsonGenerator) addCoordsToWandering(current, previous cells.Coordinat
 }
 
 // resetWandering сбрасывает блуждание, возвращая координаты, к которым надо сброситься.
-func (g *wilsonGenerator) resetWandering(start cells.Coordinates) (previous cells.Coordinates) {
+func (g *Generator) resetWandering(start cells.Coordinates) (previous cells.Coordinates) {
 	clear(g.wandering) // Очищаем блуждание.
 	return start
 }
 
 // addWanderingToMaze добавляет результат блуждания к лабиринту.
-func (g *wilsonGenerator) addWanderingToMaze() error {
+func (g *Generator) addWanderingToMaze() error {
 	var err error
 
 	for coords, transitions := range g.wandering {
-		g.mz.Cells[coords].Type, err = GetRandomSignificantType() // Клетка по координатам получает тип.
+		g.mz.Cells[coords].Type, err = gutils.GetRandomSignificantType() // Клетка по координатам получает тип.
 		if err != nil {
 			return fmt.Errorf("can`t get random significant type: %w", err)
 		}

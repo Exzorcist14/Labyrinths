@@ -1,4 +1,4 @@
-package generators
+package gutils
 
 import (
 	"crypto/rand"
@@ -9,8 +9,8 @@ import (
 )
 
 var (
-	dx = []int{-1, 0, 0, 1} // Слайс сдвигов по x, ведущий к смежным по стороне координатам.
-	dy = []int{0, -1, 1, 0} // Слайс сдвигов по y, ведущий к смежным по стороне координатам.
+	Dx = []int{-1, 0, 0, 1} // Слайс сдвигов по x, ведущий к смежным по стороне координатам.
+	Dy = []int{0, -1, 1, 0} // Слайс сдвигов по y, ведущий к смежным по стороне координатам.
 )
 
 // IsInside возвращает true, если координаты находятся в пределах лабиринта, иначе false.
@@ -61,12 +61,12 @@ func GetRandomAdjacentCoords(coords cells.Coordinates, height, width int) (cells
 	nextCoords := coords
 
 	for nextCoords == coords || !IsInside(nextCoords, height, width) {
-		offsetNumber, err := GetRandomInt(len(dx))
+		offsetNumber, err := GetRandomInt(len(Dx))
 		if err != nil {
 			return cells.Coordinates{}, fmt.Errorf("can`t generate random number of offset: %w", err)
 		}
 
-		nextCoords = cells.Coordinates{X: coords.X + dx[offsetNumber], Y: coords.Y + dy[offsetNumber]}
+		nextCoords = cells.Coordinates{X: coords.X + Dx[offsetNumber], Y: coords.Y + Dy[offsetNumber]}
 	}
 
 	return nextCoords, nil

@@ -12,14 +12,23 @@ func RestorePath(start, end cells.Coordinates, ps Predecessors) []cells.Coordina
 	)
 
 	current := end
+	returned := false
 
 	for current != ps[start] {
-		invertedPath = append(invertedPath, current) // Проходясь по Predecessors, получается путь в обратном порядке.
+		invertedPath = append(invertedPath, current) // Проходясь по predecessors, получается путь в обратном порядке.
+
 		current = ps[current]
+		if current == start {
+			returned = true
+		}
 	}
 
 	for i := len(invertedPath) - 1; i >= 0; i-- {
 		path = append(path, invertedPath[i]) // Формируем прямой порядок.
+	}
+
+	if !returned {
+		return []cells.Coordinates{}
 	}
 
 	return path

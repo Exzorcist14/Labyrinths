@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_askCorrectData(t *testing.T) {
+func TestAskCorrectData(t *testing.T) {
 	const err = "err"
 
 	printf := func(_ string, _ ...any) {}

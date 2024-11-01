@@ -3,6 +3,8 @@ package solvers
 import (
 	"github.com/es-debug/backend-academy-2024-go-template/internal/domain/maze"
 	"github.com/es-debug/backend-academy-2024-go-template/internal/domain/maze/cells"
+	"github.com/es-debug/backend-academy-2024-go-template/internal/domain/solvers/dfs"
+	"github.com/es-debug/backend-academy-2024-go-template/internal/domain/solvers/dijkstra"
 )
 
 type solver interface {
@@ -13,10 +15,10 @@ type solver interface {
 func New(solverType string) solver {
 	switch solverType {
 	case "dijkstra":
-		return newDijkstraSolver()
+		return dijkstra.NewDijkstraSolver()
 	case "mdfs":
-		return newDfsSolver()
+		return dfs.NewDfsSolver()
 	default:
-		return newDijkstraSolver()
+		return dijkstra.NewDijkstraSolver()
 	}
 }
