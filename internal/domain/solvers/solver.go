@@ -15,10 +15,10 @@ type solver interface {
 func New(solverType string) solver {
 	switch solverType {
 	case "dijkstra":
-		return dijkstra.NewDijkstraSolver()
+		return dijkstra.NewSolver()
 	case "mdfs":
-		return dfs.NewDfsSolver()
+		return dfs.NewSolver()
 	default:
-		return dijkstra.NewDijkstraSolver()
+		return dijkstra.NewSolver()
 	}
 }

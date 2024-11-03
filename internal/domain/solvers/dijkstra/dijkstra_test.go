@@ -73,7 +73,7 @@ func TestDijkstraSolverSolve(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := dijkstra.NewDijkstraSolver()
+			s := dijkstra.NewSolver()
 
 			path := s.Solve(tt.args.mz, tt.args.start, tt.args.end)
 

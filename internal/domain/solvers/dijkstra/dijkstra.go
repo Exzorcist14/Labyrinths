@@ -18,8 +18,8 @@ type Solver struct {
 	predecessors sutils.Predecessors              // Хранит для каждой вершины информацию о её предшественниках.
 }
 
-// NewDijkstraSolver возвращает указатель на инициализированный Solver.
-func NewDijkstraSolver() *Solver {
+// NewSolver возвращает указатель на инициализированный Solver.
+func NewSolver() *Solver {
 	ds := Solver{
 		dist: make(map[cells.Coordinates]cells.Type),
 		heap: sutils.New(),

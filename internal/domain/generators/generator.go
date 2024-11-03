@@ -14,10 +14,10 @@ type generator interface {
 func New(generatorType string) generator {
 	switch generatorType {
 	case "prim":
-		return prim.NewPrimGenerator()
+		return prim.NewGenerator()
 	case "wilson":
-		return wilson.NewWilsonGenerator()
+		return wilson.NewGenerator()
 	default:
-		return prim.NewPrimGenerator()
+		return prim.NewGenerator()
 	}
 }

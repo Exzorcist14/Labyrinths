@@ -14,8 +14,8 @@ type Generator struct {
 	mz     maze.Maze
 }
 
-// NewPrimGenerator возвращает указатель на новый primGenerator.
-func NewPrimGenerator() *Generator {
+// NewGenerator возвращает указатель на новый primGenerator.
+func NewGenerator() *Generator {
 	return &Generator{
 		border: make(map[cells.Coordinates]struct{}),
 	}

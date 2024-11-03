@@ -13,8 +13,8 @@ type Solver struct {
 	mz           maze.Maze
 }
 
-// NewDfsSolver возвращает указатель на инициализированный Solver.
-func NewDfsSolver() *Solver {
+// NewSolver возвращает указатель на инициализированный Solver.
+func NewSolver() *Solver {
 	return &Solver{
 		visited: make(map[cells.Coordinates]struct{}),
 	}

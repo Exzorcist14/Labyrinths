@@ -15,8 +15,8 @@ type Generator struct {
 	mz        maze.Maze
 }
 
-// NewWilsonGenerator возвращает указатель на новый Generator.
-func NewWilsonGenerator() *Generator {
+// NewGenerator возвращает указатель на новый Generator.
+func NewGenerator() *Generator {
 	return &Generator{
 		unvisited: make(map[cells.Coordinates]struct{}),
 		wandering: make(map[cells.Coordinates][]cells.Coordinates),

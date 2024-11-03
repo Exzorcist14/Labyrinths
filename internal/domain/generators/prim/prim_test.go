@@ -16,9 +16,8 @@ func TestPrimGeneratorGenerate(t *testing.T) {
 	}
 
 	tests := []struct {
-		name                       string
-		args                       args
-		expectedIsComponentOnlyOne bool
+		name string
+		args args
 	}{
 		{
 			name: "height & width: 1x1",
@@ -26,7 +25,6 @@ func TestPrimGeneratorGenerate(t *testing.T) {
 				height: 1,
 				width:  1,
 			},
-			expectedIsComponentOnlyOne: true,
 		},
 		{
 			name: "height & width: 8x8",
@@ -34,7 +32,6 @@ func TestPrimGeneratorGenerate(t *testing.T) {
 				height: 8,
 				width:  8,
 			},
-			expectedIsComponentOnlyOne: true,
 		},
 		{
 			name: "height & width: 64x64",
@@ -42,7 +39,6 @@ func TestPrimGeneratorGenerate(t *testing.T) {
 				height: 64,
 				width:  64,
 			},
-			expectedIsComponentOnlyOne: true,
 		},
 		{
 			name: "height & width: 512x512",
@@ -50,7 +46,6 @@ func TestPrimGeneratorGenerate(t *testing.T) {
 				height: 512,
 				width:  512,
 			},
-			expectedIsComponentOnlyOne: true,
 		},
 		{
 			name: "height & width: 1024x512",
@@ -58,7 +53,6 @@ func TestPrimGeneratorGenerate(t *testing.T) {
 				height: 1024,
 				width:  512,
 			},
-			expectedIsComponentOnlyOne: true,
 		},
 		{
 			name: "height & width: 512x1024",
@@ -66,18 +60,17 @@ func TestPrimGeneratorGenerate(t *testing.T) {
 				height: 512,
 				width:  1024,
 			},
-			expectedIsComponentOnlyOne: true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			g := prim.NewPrimGenerator()
+			g := prim.NewGenerator()
 
 			mz, err := g.Generate(tt.args.height, tt.args.width)
 
 			assert.NoError(t, err)
-			assert.Equal(t, tt.expectedIsComponentOnlyOne, isComponentOnlyOne(mz))
+			assert.True(t, isComponentOnlyOne(mz))
 		})
 	}
 }
